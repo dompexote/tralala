@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ReelForge — Talk to camera. Get a finished reel.</title>
+<style>
+:root{--bg:#faf6ef;--fg:#1d1a16;--mut:#6b645a;--card:#fff;--line:#e6dfd2;--ac:#ff5a36;--ac2:#1d1a16;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#14120f;--fg:#f4efe6;--mut:#a39a8b;--card:#1e1b16;--line:#332e26;--ac2:#f4efe6;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#14120f;--fg:#f4efe6;--mut:#a39a8b;--card:#1e1b16;--line:#332e26;--ac2:#f4efe6;color-scheme:dark}
+html{scroll-behavior:smooth;scroll-padding-top:70px}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.55 system-ui,-apple-system,"Segoe UI",sans-serif}
+h1,h2,h3{font-family:Georgia,"Times New Roman",serif;line-height:1.1;margin:0 0 .4em;font-weight:600}
+h1{font-size:clamp(2.2rem,6vw,4rem)}h2{font-size:clamp(1.7rem,4vw,2.5rem)}h3{font-size:1.15rem}
+em{color:var(--ac);font-style:italic}
+a{color:inherit}.wrap{max-width:1100px;margin:auto;padding:0 20px}section{padding:64px 0}
+nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--bg);border-bottom:1px solid var(--line)}
+nav .wrap{display:flex;align-items:center;gap:18px;height:60px}nav .sp{flex:1}
+nav a{text-decoration:none;font-size:.92rem}.logo{font:600 1.3rem Georgia,serif}
+.btn{display:inline-block;border:0;background:var(--ac2);color:var(--bg);padding:11px 20px;border-radius:99px;font:600 .95rem inherit;cursor:pointer;text-decoration:none}
+.btn.pri{background:var(--ac);color:#fff}.btn.ghost{background:none;color:var(--fg);border:1px solid var(--line)}
+.btn.sm{padding:7px 14px;font-size:.85rem}
+.eyebrow{color:var(--ac);font-weight:600;font-size:.85rem;text-transform:uppercase;letter-spacing:.08em}
+.hero{display:grid;grid-template-columns:1.05fr 1fr;gap:40px;align-items:start}
+.hero p.lead{font-size:1.15rem;color:var(--mut);max-width:520px}
+.small{color:var(--mut);font-size:.85rem}
+.studio{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:14px;display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.stagebox{display:flex;justify-content:center;align-items:flex-start}
+.stage{position:relative;background:linear-gradient(160deg,#3b2a55,#c2410c);border-radius:12px;overflow:hidden;width:100%;max-width:230px;aspect-ratio:9/16}
+.stage.r11{aspect-ratio:1;max-width:100%}.stage.r169{aspect-ratio:16/9;max-width:100%}
+.stage video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.face{position:absolute;left:50%;top:32%;width:34%;aspect-ratio:1;transform:translateX(-50%);background:#f2c9a5;border-radius:50%;box-shadow:0 60px 0 28px #20202a}
+.broll{position:absolute;inset:0 0 50% 0;display:none;align-items:center;justify-content:center;background:linear-gradient(135deg,#0f766e,#1e3a8a);color:#fff;font:600 .75rem system-ui;text-align:center;padding:6px}
+.cap{position:absolute;left:6%;right:6%;bottom:12%;text-align:center;font:800 .95rem/1.25 system-ui;color:#fff}
+.cap span{opacity:.55}.cap span.on{opacity:1}
+.cap.classic{text-shadow:0 2px 4px #000}.cap.classic span.on{color:#ffe14d}
+.cap.bold{text-transform:uppercase;font-size:1.05rem}.cap.bold span.on{background:var(--ac);padding:0 3px;border-radius:3px;opacity:1}
+.cap.minimal{font-weight:500;background:#0009;padding:4px 6px;border-radius:6px}
+.cap.neon{color:#7df9ff;text-shadow:0 0 8px #00e5ff}.cap.neon span.on{color:#fff;text-shadow:0 0 10px #ff2bd6,0 0 18px #ff2bd6}
+.wm{position:absolute;top:6px;right:8px;font:600 .6rem system-ui;color:#fff9}
+.cards{display:flex;flex-direction:column;gap:8px;max-height:330px;overflow:auto}
+.sc{border:1px solid var(--line);border-radius:10px;padding:8px;font-size:.85rem}
+.sc.act{border-color:var(--ac);box-shadow:0 0 0 2px #ff5a3630}
+.sc .tm{font-size:.7rem;color:var(--mut);display:flex;gap:6px;align-items:center;margin-bottom:3px}
+.sc p{margin:0;outline:0}.sc select,.sc button,.tools select{font:inherit;font-size:.72rem;background:var(--bg);color:var(--fg);border:1px solid var(--line);border-radius:6px;padding:2px 4px}
+.tools{display:flex;flex-wrap:wrap;gap:6px;align-items:center;grid-column:1/-1;border-top:1px solid var(--line);padding-top:10px}
+.tools .pill{border:1px solid var(--line);background:var(--bg);color:var(--fg);padding:5px 11px;border-radius:99px;cursor:pointer;font-size:.8rem}
+.tools .pill.on{background:var(--ac);color:#fff;border-color:var(--ac)}
+.tools input[type=range]{flex:1;min-width:100px}
+.grid{display:grid;gap:18px}.g3{grid-template-columns:repeat(3,1fr)}.g4{grid-template-columns:repeat(4,1fr)}.g2{grid-template-columns:repeat(2,1fr)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px}
+.card .k{color:var(--ac);font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em}
+.num{font:600 2rem Georgia,serif;color:var(--ac)}
+.price{font:600 2.4rem Georgia,serif}.card ul{padding-left:18px;color:var(--mut);margin:12px 0 18px}
+.card.hot{border:2px solid var(--ac)}
+details{border-bottom:1px solid var(--line);padding:14px 0}summary{cursor:pointer;font-weight:600;list-style:none;display:flex;justify-content:space-between}
+summary::after{content:"+";color:var(--ac)}details[open] summary::after{content:"–"}details p{color:var(--mut);margin:.6em 0 0}
+.cta{text-align:center;background:var(--ac2);color:var(--bg);border-radius:24px;padding:56px 20px}
+.cta em{color:var(--ac)}
+dialog{border:1px solid var(--line);border-radius:16px;background:var(--card);color:var(--fg);padding:24px;max-width:360px;width:calc(100% - 32px)}
+dialog::backdrop{background:#0008}dialog input{width:100%;padding:10px;margin:6px 0 12px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--fg);font:inherit}
+footer{border-top:1px solid var(--line);padding:28px 0;color:var(--mut);font-size:.9rem}footer .wrap{display:flex;gap:18px;flex-wrap:wrap;align-items:center}
+@media(max-width:860px){.hero,.g3,.g4,.g2,.studio{grid-template-columns:1fr}nav .links{display:none}.stage{max-width:210px}}
+</style></head><body>
+<nav><div class="wrap"><a class="logo" href="#top">Reel<em>forge</em></a><span class="sp"></span>
+<span class="links" style="display:flex;gap:18px"><a href="#how">How it works</a><a href="#features">Features</a><a href="#pricing">Pricing</a></span>
+<button class="btn ghost sm" data-auth="Log in">Log in</button><button class="btn pri sm" data-auth="Create your account">Try it free</button></div></nav>
+<main id="top">
+<section><div class="wrap hero"><div>
+<div class="eyebrow">For people who talk to camera, not editors</div>
+<h1>Talk to camera. <em>Get a finished reel.</em></h1>
+<p class="lead">Upload a talking-head clip. ReelForge writes word-timed captions, lets you drop stock B-roll on any sentence, adds music and exports for Reels, Shorts and YouTube. You edit it like a script.</p>
+<p><button class="btn pri" data-auth="Create your account">Make your first reel, free</button> <a class="btn ghost" href="#demo">Watch the demo</a></p>
+<p class="small">No card needed · 9:16, 1:1 and 16:9 export</p>
+<p class="small">↘ The editor on the right is live: edit the text, switch styles, add your own video.</p></div>
+<div class="studio" id="studio">
+<div class="stagebox"><div class="stage" id="stage"><video id="v" muted playsinline hidden></video><div class="face" id="face"></div><div class="broll" id="broll"></div><div class="cap bold" id="cap"></div><div class="wm">ReelForge</div></div></div>
+<div><div class="small" style="margin-bottom:6px">Script — what you said, as editable cards</div><div class="cards" id="cards"></div><button class="btn ghost sm" id="add" style="margin-top:8px">+ Add sentence</button></div>
+<div class="tools">
+<button class="pill" id="play">▶ Play</button><input type="range" id="seek" min="0" max="1000" value="0"><span class="small" id="time">0:00</span>
+<select id="sty"><option value="classic">Classic</option><option value="bold" selected>Bold</option><option value="minimal">Minimal</option><option value="neon">Neon</option></select>
+<select id="rat"><option>9:16</option><option>1:1</option><option>16:9</option></select>
+<button class="pill" id="mus">♫ Music</button>
+<label class="pill" style="cursor:pointer">Upload clip<input type="file" id="file" accept="video/*" hidden></label>
+<button class="pill" id="rec">● Record</button>
+<button class="pill on" id="exp">Export .webm</button></div></div></div></section>
+
+<section id="how"><div class="wrap"><h2>Three steps. <em>No timeline hunting.</em></h2><div class="grid g3">
+<div class="card"><div class="num">01</div><h3>Record or upload your take</h3><p class="small">Record straight from your browser, or upload phone footage or a Zoom clip. It gets split into sentences.</p></div>
+<div class="card"><div class="num">02</div><h3>Edit like a script</h3><p class="small">Each sentence is a caption card. Fix a word, pick a style, attach B-roll. The video follows.</p></div>
+<div class="card"><div class="num">03</div><h3>Export and post</h3><p class="small">Vertical, square or wide, with captions burned in and music underneath.</p></div></div></div></section>
+
+<section id="demo"><div class="wrap"><h2>See it <em>in action.</em></h2><p class="small">A raw clip becomes a captioned reel with B-roll, start to finish. Use the live editor above, or add your own demo video here:</p>
+<div class="card" style="text-align:center"><input type="url" id="demourl" placeholder="Paste a YouTube, Loom or Vimeo link" style="width:70%;padding:8px;border-radius:8px;border:1px solid var(--line);background:var(--bg);color:var(--fg)"> <button class="btn sm" id="demoset">Load</button><div id="demobox" style="margin-top:12px"></div></div></div></section>
+
+<section id="features"><div class="wrap"><h2>Everything a talking-head reel needs. <em>Nothing it doesn’t.</em></h2><div class="grid g4" id="feat"></div></div></section>
+
+<section><div class="wrap"><h2>Made for the expert in the frame, <em>not the editor behind it.</em></h2><div class="grid g4">
+<div class="card"><h3>Founders</h3><p class="small">Turn a product update into a LinkedIn clip.</p></div><div class="card"><h3>Coaches &amp; teachers</h3><p class="small">One lesson, several captioned reels.</p></div>
+<div class="card"><h3>Doctors, lawyers, CAs</h3><p class="small">Explain it once on camera, post it all week.</p></div><div class="card"><h3>Podcasters</h3><p class="small">Pull the best minute out of the hour.</p></div></div></div></section>
+
+<section id="pricing"><div class="wrap"><h2>Plain pricing.</h2><p class="small">Start free. Upgrade when you post more. (Prices below are placeholders — edit the <code>PLANS</code> array.)</p><div class="grid g4" id="plans"></div></div></section>
+
+<section><div class="wrap" style="max-width:760px"><h2>Fair questions.</h2>
+<details><summary>Is there a free plan?</summary><p>Yes, with every feature included. Free keeps 3 projects at a time and includes 10 exports a month. Free exports carry a small ReelForge watermark; paid plans remove it.</p></details>
+<details><summary>How long can my videos be?</summary><p>Up to three minutes on Free and Basic, five on Pro and ten on Advance.</p></details>
+<details><summary>Do I need to know video editing?</summary><p>No. If you can edit a document, you can edit in ReelForge.</p></details>
+<details><summary>Which languages do captions support?</summary><p>English (US, UK and India), Hindi, Hinglish, Spanish, Portuguese, French and German.</p></details>
+<details><summary>Can I use my own B-roll?</summary><p>Yes. Upload your own clips, or search the built-in stock library.</p></details></div></section>
+
+<section><div class="wrap"><div class="cta"><h2>Talk once. <em>Post all week.</em></h2><button class="btn pri" data-auth="Create your account">Make your first reel, free</button></div></div></section>
+</main>
+<footer><div class="wrap"><a class="logo" href="#top">Reel<em>forge</em></a><span>© 2026 ReelForge</span><span style="flex:1"></span><a href="#features">Features</a><a href="#pricing">Pricing</a></footer>
+<dialog id="dlg"><h3 id="dt">Log in</h3><label class="small">Email</label><input id="em" type="email" placeholder="you@example.com"><button class="btn pri" id="go">Continue</button> <button class="btn ghost" id="cl">Close</button><p class="small" id="dm"></p></dialog>
+
+<script>
+const $=id=>document.getElementById(id);
+const BR=["—","scrolling a feed","office team","city timelapse","typing on laptop","coffee pour"];
+let S=[{t:"So the first thing I tell every founder —",b:1},{t:"most of your content never gets finished.",b:0},{t:"You open with context instead of a hook.",b:3},{t:"Say the result first, then earn the why.",b:0}];
+let ratio="9:16",D=24,t=0,playing=false,hasVid=false,last=0,mus=null;
+const v=$("v"),cap=$("cap"),stage=$("stage");
+const fmt=s=>Math.floor(s/60)+":"+String(Math.floor(s%60)).padStart(2,"0");
+const dur=()=>hasVid&&isFinite(v.duration)?v.duration:D;
+function cards(){
+  $("cards").innerHTML="";
+  S.forEach((s,i)=>{const d=document.createElement("div");d.className="sc";d.id="c"+i;
+    d.innerHTML=`<div class="tm"><span>${fmt(i*dur()/S.length)}</span><select>${BR.map((b,j)=>`<option value="${j}" ${j==s.b?"selected":""}>${j?"B-roll: "+b:"No B-roll"}</option>`).join("")}</select><button title="Delete">✕</button></div><p contenteditable="true"></p>`;
+    const p=d.querySelector("p");p.textContent=s.t;
+    p.oninput=()=>{s.t=p.textContent;draw()};
+    d.querySelector("select").onchange=e=>{s.b=+e.target.value;draw()};
+    d.querySelector("button").onclick=()=>{if(S.length>1){S.splice(i,1);cards();draw()}};
+    d.querySelector(".tm span").onclick=()=>{t=i*dur()/S.length;if(hasVid)v.currentTime=t;draw()};
+    $("cards").appendChild(d)})}
+function cur(tt){const n=S.length,i=Math.min(n-1,Math.floor(tt/dur()*n)),f=tt/dur()*n-i,w=S[i].t.split(/\s+/).filter(Boolean);return{i,w,wi:Math.min(w.length-1,Math.floor(Math.max(0,f)*w.length))}}
+function draw(){
+  const c=cur(t);cap.innerHTML=c.w.map((w,k)=>`<span class="${k<=c.wi?"on":""}">${w.replace(/</g,"&lt;")}</span>`).join(" ");
+  const b=S[c.i].b;$("broll").style.display=b?"flex":"none";$("broll").textContent="B-ROLL · "+BR[b];
+  document.querySelectorAll(".sc").forEach((e,k)=>e.classList.toggle("act",k==c.i));
+  $("seek").value=t/dur()*1000;$("time").textContent=fmt(t)+" / "+fmt(dur())}
+function loop(ts){if(!playing)return;const dt=(ts-last)/1000;last=ts;
+  if(hasVid)t=v.currentTime;else t+=dt;
+  if(t>=dur()){t=0;playing=false;v.pause();$("play").textContent="▶ Play";if(mus)mus.stop()}else requestAnimationFrame(loop);draw()}
+$("play").onclick=()=>{playing=!playing;$("play").textContent=playing?"❚❚ Pause":"▶ Play";
+  if(playing){if(hasVid){v.currentTime=t;v.play()}last=performance.now();requestAnimationFrame(loop)}else v.pause()};
+$("seek").oninput=e=>{t=e.target.value/1000*dur();if(hasVid)v.currentTime=t;draw()};
+$("sty").onchange=e=>cap.className="cap "+e.target.value;
+$("rat").onchange=e=>{ratio=e.target.value;stage.className="stage "+(ratio=="1:1"?"r11":ratio=="16:9"?"r169":"")};
+$("add").onclick=()=>{S.push({t:"New sentence",b:0});cards();draw()};
+$("file").onchange=e=>{const f=e.target.files[0];if(!f)return;loadVid(URL.createObjectURL(f))};
+function loadVid(u){v.src=u;v.hidden=false;$("face").style.display="none";v.onloadedmetadata=()=>{hasVid=true;t=0;cards();draw()}}
+$("rec").onclick=async()=>{
+  try{const st=await navigator.mediaDevices.getUserMedia({video:true,audio:true});const ch=[],r=new MediaRecorder(st);
+    r.ondataavailable=e=>ch.push(e.data);r.onstop=()=>{st.getTracks().forEach(x=>x.stop());loadVid(URL.createObjectURL(new Blob(ch,{type:"video/webm"})));$("rec").textContent="● Record";$("rec").onclick=rec0};
+    let n=3;const iv=setInterval(()=>{$("rec").textContent=n>0?"Starting in "+n--:"■ Stop";if(n<-1){clearInterval(iv)}},1000);
+    setTimeout(()=>{r.start();$("rec").onclick=()=>r.stop()},3000);
+  }catch(e){alert("Camera/microphone not available here. Try uploading a clip instead.")}};
+const rec0=$("rec").onclick;
+$("mus").onclick=()=>{const b=$("mus");
+  if(mus){mus.stop();mus=null;b.classList.remove("on");return}
+  try{const A=new (window.AudioContext||window.webkitAudioContext)(),g=A.createGain(),f=A.createBiquadFilter();f.type="lowpass";f.frequency.value=700;g.gain.value=.05;f.connect(g);g.connect(A.destination);
+    const os=[220,261.6,329.6,392].map(fr=>{const o=A.createOscillator();o.type="triangle";o.frequency.value=fr;o.connect(f);o.start();return o});
+    mus={stop(){os.forEach(o=>o.stop());A.close()}};b.classList.add("on")}catch(e){}};
+$("exp").onclick=async()=>{
+  const [w,h]={"9:16":[360,640],"1:1":[480,480],"16:9":[640,360]}[ratio],c=document.createElement("canvas");c.width=w;c.height=h;const x=c.getContext("2d");
+  if(!c.captureStream||!window.MediaRecorder){alert("Export isn’t supported in this browser.");return}
+  const ch=[],r=new MediaRecorder(c.captureStream(30));r.ondataavailable=e=>ch.push(e.data);
+  r.onstop=()=>{const a=document.createElement("a");a.href=URL.createObjectURL(new Blob(ch,{type:"video/webm"}));a.download="reelforge-reel.webm";a.click();$("exp").textContent="Export .webm"};
+  playing=false;const st=getComputedStyle(cap).color,sty=$("sty").value;
+  if(hasVid){v.currentTime=0;await v.play()}r.start();const t0=performance.now(),D0=dur();
+  (function f(){const el=(performance.now()-t0)/1000,tt=hasVid?v.currentTime:el;
+    const g=x.createLinearGradient(0,0,w,h);g.addColorStop(0,"#3b2a55");g.addColorStop(1,"#c2410c");x.fillStyle=g;x.fillRect(0,0,w,h);
+    if(hasVid){const s=Math.max(w/v.videoWidth,h/v.videoHeight),dw=v.videoWidth*s,dh=v.videoHeight*s;x.drawImage(v,(w-dw)/2,(h-dh)/2,dw,dh)}
+    const c2=cur(tt),b=S[c2.i].b;if(b){x.fillStyle="#0f766e";x.fillRect(0,0,w,h/2);x.fillStyle="#fff";x.font="600 14px system-ui";x.textAlign="center";x.fillText("B-ROLL · "+BR[b],w/2,h/4)}
+    const fs=Math.round(w/16);x.font="800 "+fs+"px system-ui";x.textAlign="left";
+    let lines=[],ln=[],wid=0;c2.w.forEach((wd,k)=>{const ww=x.measureText(wd+" ").width;if(wid+ww>w*.88){lines.push(ln);ln=[];wid=0}ln.push([wd,k]);wid+=ww});lines.push(ln);
+    let y=h*.82-lines.length*fs*1.3;lines.forEach(L=>{const tw=L.reduce((a,p)=>a+x.measureText(p[0]+" ").width,0);let xx=(w-tw)/2;
+      L.forEach(([wd,k])=>{const on=k<=c2.wi;x.fillStyle=on?(sty=="bold"?"#ff5a36":sty=="neon"?"#fff":"#ffe14d"):"rgba(255,255,255,.55)";if(sty=="neon"){x.shadowColor="#ff2bd6";x.shadowBlur=on?14:0}
+        x.fillText(sty=="bold"?wd.toUpperCase():wd,xx,y);x.shadowBlur=0;xx+=x.measureText(wd+" ").width});y+=fs*1.3});
+    x.fillStyle="#fff9";x.font="600 11px system-ui";x.textAlign="right";x.fillText("ReelForge",w-8,16);
+    $("exp").textContent="Exporting "+Math.round(Math.min(1,el/D0)*100)+"%";
+    if(el<D0)requestAnimationFrame(f);else{r.stop();v.pause()}})()};
+const F=[["Captions","Word-timed, in 6 languages + Hinglish","Edit text in place and choose Classic, Bold, Minimal or Neon."],["B-roll","A shot for every sentence","Attach stock shots to any sentence, or use your own."],["Music","A bed under your voice","Layer audio without leaving the project. Included on every plan."],["Formats","One edit, three shapes","9:16, 1:1 and 16:9. The preview shows what each crop keeps."],["Pauses","Dead air and ums, gone","Long silences and filler words cut at export."],["Reframe","The frame follows you","Keeps your face in view when going vertical."],["Record","No camera app needed","Record in the browser with a countdown."],["Autosave","Nothing to lose","Every edit saves as you go."]];
+$("feat").innerHTML=F.map(f=>`<div class="card"><div class="k">${f[0]}</div><h3>${f[1]}</h3><p class="small">${f[2]}</p></div>`).join("");
+const PLANS=[{n:"Free",p:"₹0",l:["3 projects at a time","Videos up to 3 min","10 exports a month","Every feature","Watermark on export"]},{n:"Basic",p:"₹—",l:["More projects","Videos up to 3 min","No watermark"]},{n:"Pro",p:"₹—",hot:1,l:["Even more exports","Videos up to 5 min","No watermark"]},{n:"Advance",p:"₹—",l:["Highest limits","Videos up to 10 min","No watermark"]}];
+$("plans").innerHTML=PLANS.map(p=>`<div class="card ${p.hot?"hot":""}"><h3>${p.n}</h3><div class="price">${p.p}</div><ul>${p.l.map(i=>"<li>"+i+"</li>").join("")}</ul><button class="btn ${p.hot?"pri":""}" data-auth="Create your account">${p.n=="Free"?"Start free":"Choose "+p.n}</button></div>`).join("");
+function toEmbed(u){let m;
+  if(m=u.match(/(?:youtube\.com\/(?:watch\?(?:.*&)?v=|shorts\/|embed\/)|youtu\.be\/)([\w-]{11})/)){const s=u.match(/[?&]t=(\d+)/);return{k:"i",u:"https://www.youtube-nocookie.com/embed/"+m[1]+(s?"?start="+s[1]:"")}}
+  if(m=u.match(/loom\.com\/(?:share|embed)\/([a-f0-9]+)/i))return{k:"i",u:"https://www.loom.com/embed/"+m[1]};
+  if(m=u.match(/vimeo\.com\/(\d+)/))return{k:"i",u:"https://player.vimeo.com/video/"+m[1]};
+  if(/\.(mp4|webm|ogg)(\?|$)/i.test(u))return{k:"v",u};
+  return null}
+$("demoset").onclick=()=>{const u=$("demourl").value.trim(),e=toEmbed(u),b=$("demobox");
+  if(!e){b.innerHTML='<p class="small">Link not recognized. Use a YouTube, Loom or Vimeo link, or a direct .mp4 URL.</p>';return}
+  b.innerHTML=e.k=="v"?`<video src="${e.u}" controls style="width:100%;border-radius:12px"></video>`:`<iframe src="${e.u}" style="width:100%;aspect-ratio:16/9;border:0;border-radius:12px" allow="accelerometer;autoplay;encrypted-media;fullscreen;picture-in-picture" allowfullscreen></iframe>`};
+document.querySelectorAll("[data-auth]").forEach(b=>b.onclick=()=>{$("dt").textContent=b.dataset.auth;$("dm").textContent="";$("dlg").showModal()});
+$("cl").onclick=()=>$("dlg").close();
+$("go").onclick=()=>{const e=$("em").value.trim();if(!/\S+@\S+\.\S+/.test(e)){$("dm").textContent="Enter a valid email.";return}
+  try{localStorage.setItem("rf_user",e)}catch(_){}$("dm").textContent="Demo mode: no real account is created. Signed in as "+e+".";};
+cards();draw();
+</script></body></html>
